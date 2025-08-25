@@ -1,35 +1,59 @@
 const { GoogleGenAI, Type } = require("@google/genai");
-
+require("dotenv").config();
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
 
-const generateJobData = async (jobLink) => {
-    if (!jobLink) throw new Error("Job link is required");
-
+async function main(joblink) {
     const response = await ai.models.generateContent({
-        model: "gemini-2.5-pro",
-        contents: `
-        Analyze this job posting link: ${jobLink} and return JSON with company, role, description, required_skills, tags
-        If the link is not any career job openings Just return json with name "not_career" : "true", else false. 
-        `,
+        model: "gemini-2.5-flash",
+        contents: joblink,
         config: {
             responseMimeType: "application/json",
             responseSchema: {
-                type: Type.OBJECT,
+                type: "object",
                 properties: {
-                    company: { type: Type.STRING },
-                    role: { type: Type.STRING },
-                    description: { type: Type.STRING },
-                    required_skills: { type: Type.ARRAY, items: { type: Type.STRING } },
-                    tags: { type: Type.ARRAY, items: { type: Type.STRING } },
-                    not_career: { type: Type.BOOLEAN }
+                    companyName: { type: "string" },
+                    description: { type: "string" },
+                    salary: {
+                        type: "object",
+                        properties: {
+                            amount: { type: "number" },
+                            unit: { type: "string", enum: ["LPA", "perMonth", "stipend"] }
+                        },
+                        required: ["amount", "unit"]
+                    },
+                    jobType: { type: "string", enum: ["internship", "placement"] },
+                    companyType: { type: "string", enum: ["pbc"] },
+                    location: { type: "string" },
+                    eligibility: {
+                        type: "array",
+                        items: { type: "string" }
+                    },
+                    deadline: { type: "string", format: "date-time" },
+                    applicationLink: { type: "string" },
+                    rounds: {
+                        type: "array",
+                        items: { type: "string" }
+                    },
                 },
-                propertyOrdering: ["company", "role", "description", "required_skills", "tags"]
+                required: [
+                    "companyName",
+                    "description",
+                    "salary",
+                    "jobType",
+                    "companyType",
+                    "location",
+                    "eligibility",
+                    "deadline",
+                    "applicationLink",
+                    "rounds"
+                ],
+                additionalProperties: false
             }
-        }
+
+        },
     });
 
-    console.log(JSON.parse(response.text));
     return JSON.parse(response.text);
-};
+}
 
-module.exports = { generateJobData };
+module.exports = { main };

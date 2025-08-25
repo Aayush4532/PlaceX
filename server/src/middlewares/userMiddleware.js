@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { connection } = require("../config/dbConnect.js");
+require("dotenv").config();
 const redisClient = require("../config/redis");
 
 const userMiddleware = async (req, res, next) => {
@@ -8,7 +9,7 @@ const userMiddleware = async (req, res, next) => {
         if (!token)
             throw new Error("Token is not present");
 
-        const payload = jwt.verify(token, process.env.JWT_KEY);
+        const payload = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
         const { id } = payload;
 
@@ -42,4 +43,4 @@ const userMiddleware = async (req, res, next) => {
 }
 
 
-module.exports = userMiddleware;
+module.exports = {userMiddleware};

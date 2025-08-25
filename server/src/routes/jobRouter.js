@@ -1,8 +1,10 @@
 const router = require("express").Router();
-const {getAllJobs, getJobById} = require("../controllers/jobController");
+const {getAllJobs, getJobById, postJob} = require("../controllers/jobController");
+const { userMiddleware } = require("../middlewares/userMiddleware");
 
-router.get("/opportunities", getAllJobs);
-router.get("/opportunities/:id", getJobById);
+router.get("/opportunities",userMiddleware, getAllJobs);
+router.get("/opportunities/:id", userMiddleware, getJobById);
+router.post("/opportunities", userMiddleware ,postJob);
 // router.put("/opportunities/:id", updateJob);
 
 module.exports = router;
