@@ -13,7 +13,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api', require('./src/routes/authRouter.js'));
 app.use('/api', require('./src/routes/jobRouter.js'));
-
+app.use('/api', require('./src/routes/companyRouter.js'));
 
 connection.connect().then(() => {
   redisClient.connect().then(() => {
